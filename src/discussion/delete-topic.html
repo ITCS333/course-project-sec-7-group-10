@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="topic.js" defer></script>
+    <title>Delete Topic</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Delete Topic</h1>
+    </header>
+    <main>
+        <section>
+            <h2>Confirm Deletion</h2>
+            <p>Are you sure you want to delete the topic: <strong id="topic-subject">Question about CSS Flexbox</strong>?</p>
+            <p>This action cannot be undone.</p>
+            <button id="confirm-delete">Yes, Delete</button>
+            <button id="cancel-delete">Cancel</button>
+        </section>
+    </main>
+
+    <script>
+        
+        document.getElementById('confirm-delete').onclick = function() {
+           
+        };
+
+        document.getElementById('cancel-delete').onclick = function() {
+           
+            window.location.href = 'board.html'; 
+        };
+    </script>
+</body>
+</html>
