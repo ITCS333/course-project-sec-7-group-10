@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="topic.js" defer></script>
+    <title>Edit Topic</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Edit Topic</h1>
+    </header>
+    <main>
+        <section>
+            <h2>Edit Topic Details</h2>
+            <form id="edit-topic-form" action="#" method="POST">
+                <fieldset>
+                    <legend>Topic Details</legend>
+                    <label for="edit-topic-subject">Topic Subject:</label>
+                    <input id="edit-topic-subject" type="text" required>
+
+                    <label for="edit-topic-message">Main Message:</label>
+                    <textarea id="edit-topic-message" rows="6" required></textarea>
+
+                    <input type="hidden" id="topic-id" value=""> 
+                    <button type="submit">Update Topic</button>
+                </fieldset>
+            </form>
+        </section>
+    </main>
+</body>
+</html>
