@@ -1,8 +1,7 @@
 /*
   Requirement: Make the "Discussion Board" page interactive.
-
   Instructions:
-  1. Link this file to `board.html` (or `baord.html`) using:
+  1. Link this file to `board.html` (or `board.html`) using:
      <script src="board.js" defer></script>
   
   2. In `board.html`, add an `id="topic-list-container"` to the 'div'
@@ -16,14 +15,16 @@
 let topics = [];
 
 // --- Element Selections ---
-// TODO: Select the new topic form ('#new-topic-form').
+// Select the new topic form ('#new-topic-form').
+const newTopicForm = document.getElementById('new-topic-form');
 
-// TODO: Select the topic list container ('#topic-list-container').
+// Select the topic list container ('#topic-list-container').
+const topicListContainer = document.getElementById('topic-list-container');
 
 // --- Functions ---
 
 /**
- * TODO: Implement the createTopicArticle function.
+ * Implement the createTopicArticle function.
  * It takes one topic object {id, subject, author, date}.
  * It should return an <article> element matching the structure in `board.html`.
  * - The main link's `href` MUST be `topic.html?id=${id}`.
@@ -32,11 +33,35 @@ let topics = [];
  * - The "Delete" button should have a class "delete-btn" and `data-id="${id}"`.
  */
 function createTopicArticle(topic) {
-  // ... your implementation here ...
+    const article = document.createElement('article');
+
+    // Create the heading and link
+    const heading = document.createElement('h3');
+    const link = document.createElement('a');
+    link.href = `topic.html?id=${topic.id}`;
+    link.textContent = topic.subject;
+    heading.appendChild(link);
+    article.appendChild(heading);
+
+    // Create the footer
+    const footer = document.createElement('footer');
+    footer.innerHTML = `<p>Posted by: ${topic.author} on ${topic.date}</p>`;
+    article.appendChild(footer);
+
+    // Create actions div
+    const actions = document.createElement('div');
+    actions.classList.add('action-buttons');
+    actions.innerHTML = `
+        <a href="edit-topic.html">Edit</a>
+        <button class="delete-btn" data-id="${topic.id}">Delete</button>
+    `;
+    article.appendChild(actions);
+
+    return article;
 }
 
 /**
- * TODO: Implement the renderTopics function.
+ * Implement the renderTopics function.
  * It should:
  * 1. Clear the `topicListContainer`.
  * 2. Loop through the global `topics` array.
@@ -44,57 +69,82 @@ function createTopicArticle(topic) {
  * append the resulting <article> to `topicListContainer`.
  */
 function renderTopics() {
-  // ... your implementation here ...
+    // Clear the topic list container
+    topicListContainer.innerHTML = '';
+
+    // Loop through the global topics array
+    topics.forEach(topic => {
+        const topicArticle = createTopicArticle(topic);
+        topicListContainer.appendChild(topicArticle);
+    });
 }
 
 /**
- * TODO: Implement the handleCreateTopic function.
+ * Implement the handleCreateTopic function.
  * This is the event handler for the form's 'submit' event.
- * It should:
- * 1. Prevent the form's default submission.
- * 2. Get the values from the '#topic-subject' and '#topic-message' inputs.
- * 3. Create a new topic object with the structure:
- * {
- * id: `topic_${Date.now()}`,
- * subject: (subject value),
- * message: (message value),
- * author: 'Student' (use a hardcoded author for this exercise),
- * date: new Date().toISOString().split('T')[0] // Gets today's date YYYY-MM-DD
- * }
- * 4. Add this new topic object to the global `topics` array (in-memory only).
- * 5. Call `renderTopics()` to refresh the list.
- * 6. Reset the form.
  */
 function handleCreateTopic(event) {
-  // ... your implementation here ...
+    event.preventDefault(); // Prevent the default form submission
+
+    // Get the values from the '#topic-subject' and '#topic-message' inputs
+    const subject = document.getElementById('topic-subject').value;
+    const message = document.getElementById('topic-message').value;
+
+    // Create a new topic object
+    const newTopic = {
+        id: `topic_${Date.now()}`,
+        subject: subject,
+        message: message,
+        author: 'Student',
+        date: new Date().toISOString().split('T')[0] // Today's date YYYY-MM-DD
+    };
+
+    // Add this new topic object to the global topics array
+    topics.push(newTopic);
+
+    // Call renderTopics() to refresh the list
+    renderTopics();
+
+    // Reset the form
+    newTopicForm.reset();
 }
 
 /**
- * TODO: Implement the handleTopicListClick function.
+ * Implement the handleTopicListClick function.
  * This is an event listener on the `topicListContainer` (for delegation).
- * It should:
- * 1. Check if the clicked element (`event.target`) has the class "delete-btn".
- * 2. If it does, get the `data-id` attribute from the button.
- * 3. Update the global `topics` array by filtering out the topic
- * with the matching ID (in-memory only).
- * 4. Call `renderTopics()` to refresh the list.
  */
 function handleTopicListClick(event) {
-  // ... your implementation here ...
+    if (event.target.classList.contains('delete-btn')) {
+        const topicId = event.target.dataset.id; // Get the data-id attribute
+
+        // Update the global topics array by filtering out the topic
+        topics = topics.filter(topic => topic.id !== topicId);
+        
+        // Call renderTopics() to refresh the list
+        renderTopics();
+    }
 }
 
 /**
- * TODO: Implement the loadAndInitialize function.
+ * Implement the loadAndInitialize function.
  * This function needs to be 'async'.
- * It should:
- * 1. Use `fetch()` to get data from 'topics.json'.
- * 2. Parse the JSON response and store the result in the global `topics` array.
- * 3. Call `renderTopics()` to populate the list for the first time.
- * 4. Add the 'submit' event listener to `newTopicForm` (calls `handleCreateTopic`).
- * 5. Add the 'click' event listener to `topicListContainer` (calls `handleTopicListClick`).
  */
 async function loadAndInitialize() {
-  // ... your implementation here ...
+    try {
+        // Use fetch() to get data from 'topics.json'.
+        const response = await fetch('topics.json');
+        const data = await response.json();
+        topics = data; // Store the result in the global topics array
+
+        // Call renderTopics() to populate the list for the first time
+        renderTopics();
+
+        // Add event listeners
+        newTopicForm.addEventListener('submit', handleCreateTopic);
+        topicListContainer.addEventListener('click', handleTopicListClick);
+    } catch (error) {
+        console.error("Error loading topics:", error);
+    }
 }
 
 // --- Initial Page Load ---
