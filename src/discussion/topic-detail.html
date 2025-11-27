@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Add meta tags for charset and viewport. -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="topic.js" defer></script>
+
+    <!-- Add a title, for now use "Topic Details". -->
+    <title>Topic Details</title>
+
+    <!-- Link to your CSS framework or stylesheet. -->
+    <link rel="stylesheet" href="styles.css"> <!-- Assuming you have a styles.css file -->
+</head>
+<body>
+
+    <!-- Create a 'header' with a main heading ('h1'). Use a relevant topic title. -->
+    <header>
+        <h1 id="topic-subject">Advanced Techniques in CSS Flexbox</h1>
+    </header>
+
+    <!-- Create the 'main' content area. -->
+    <main>
+
+        <!-- Section 1: Original Post -->
+        <article id="original-post">
+            <!-- Add a paragraph ('p') with the main content of the topic. -->
+            <p id="op-message">This topic discusses various advanced techniques in CSS Flexbox and how they can be applied to create responsive layouts efficiently.</p>
+
+            <!-- Use a 'footer' for the metadata: "Posted by: User Name on YYYY-MM-DD". -->
+            <footer id="op-footer">
+                <span>Posted by: User Name on 2023-11-26</span>
+            </footer>
+
+            <!-- Action buttons for this topic -->
+            <div class="action-buttons">
+                <a href="edit-topic.html">Edit</a>
+                <a href="delete-topic.html">Delete</a>
+            </div>
+        </article>
+        <!-- End of article. -->
+
+        <!-- Section 2: Replies -->
+        <section id="replies-section">
+            <!-- Add a sub-heading ('h2') "Replies". -->
+            <h2>Replies</h2>
+
+            <!-- Add a container for the list of replies. -->
+            <div id="reply-list-container">
+
+                <!-- Example Reply 1: -->
+                <article>
+                    <p>The 'flex: 1' property can be a powerful tool in creating flexible layouts!</p>
+                    <footer>
+                        <span>Posted by: Flex Guru on 2023-11-25</span>
+                    </footer>
+                    <div class="action-buttons">
+                        <a href="edit-reply.html">Edit</a>
+                        <a href="delete-reply.html">Delete</a>
+                    </div>
+                </article>
+
+                <!-- Example Reply 2: -->
+                <article>
+                    <p>Don't forget about using media queries to enhance responsiveness.</p>
+                    <footer>
+                        <span>Posted by: CSS Enthusiast on 2023-11-24</span>
+                    </footer>
+                    <div class="action-buttons">
+                        <a href="edit-reply.html">Edit</a>
+                        <a href="delete-reply.html">Delete</a>
+                    </div>
+                </article>
+
+            </div>
+            <!-- End of replies container. -->
+
+        </section>
+        <!-- End of replies section. -->
+
+        <!-- Section 3: Add a Reply Form -->
+        <section>
+            <!-- Add a sub-heading ('h2') "Post a Reply". -->
+            <h2>Post a Reply</h2>
+
+            <!-- Create a 'form' for users to post new replies. Action can be '#'. -->
+            <form action="#" id="reply-form">
+                <fieldset>
+                    <legend>Your Reply</legend>
+                    <label for="new-reply">Reply Message:</label>
+                    <textarea id="new-reply" rows="4" required></textarea>
+                    <button type="submit">Post Reply</button>
+                </fieldset>
+            </form>
+            <!-- End of fieldset. -->
+        </section>
+        <!-- End of form section. -->
+
+    </main>
+    <!-- End of main. -->
+
+</body>
+</html>
