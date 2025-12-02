@@ -4,63 +4,85 @@
   Instructions:
   This page displays the full details for one week and allows for discussion.
 -->
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="en">
 <head>
     <!-- TODO: Add meta tags for charset and viewport. -->
-    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <!-- TODO: Add a title, for now use "Week Details". -->
+    <title>Week Details</title>
 
     <!-- TODO: Link to your CSS framework or stylesheet. -->
+    <link rel="stylesheet" href="styles333.css">
 </head>
 <body>
-    <!-- TODO: Create a 'header' with a main heading ('h1'). Use a dummy title like "Week 1: Introduction to HTML". -->
+    <!-- TODO: Create a 'header' with a main heading ('h1'). -->
+    <header>
+        <h1>Week 1: Introduction to HTML</h1>
+    </header>
 
     <!-- TODO: Create the 'main' content area. -->
+    <main>
 
         <!-- Section 1: Weekly Information -->
-        <!-- TODO: Use an 'article' to display the main weekly information. -->
-            <!-- TODO: Add a paragraph ('p') to display the start date, e.g., "Starts on: YYYY-MM-DD". -->
-            <!-- TODO: Add a sub-heading ('h2') "Description & Notes". -->
-            <!-- TODO: Add a paragraph ('p') with dummy text for the week's detailed notes. -->
+        <article>
+            <!-- TODO: Add a paragraph ('p') to display the start date -->
+            <p>Starts on: 2025-09-01</p>
 
-            <!-- TODO: Add another sub-heading ('h2') "Exercises & Resources". -->
-            <!-- TODO: Use an unordered list ('ul') to display the links for the week. -->
-                <!-- TODO: Add list items ('li') with anchor tags ('a') for each resource. Use dummy links for now. -->
-                <!-- Example: <li><a href="#">Exercise 1 - Basic Tags</a></li> -->
-            <!-- End of the list. -->
-        <!-- End of article. -->
+            <!-- TODO: Add a sub-heading ('h2') "Description & Notes" -->
+            <h2>Description & Notes</h2>
+            <!-- TODO: Add a paragraph ('p') with dummy text for the week's detailed notes -->
+            <p>This week focuses on understanding the basics of HTML, including page structure, semantic tags, and simple content creation.</p>
+
+            <!-- TODO: Add another sub-heading ('h2') "Exercises & Resources" -->
+            <h2>Exercises & Resources</h2>
+            <!-- TODO: Use an unordered list ('ul') to display the links for the week -->
+            <ul>
+                <li><a href="#">Exercise 1 - Basic Tags</a></li>
+                <li><a href="#">Exercise 2 - Creating Lists</a></li>
+                <li><a href="#">Resource - HTML Reference</a></li>
+            </ul>
+        </article>
+        <!-- End of article -->
 
         <!-- Section 2: Discussion Forum -->
-        <!-- TODO: Create a 'section' for the discussion, with an 'id' of "discussion-forum". -->
-            <!-- TODO: Add a sub-heading ('h2') "Discussion". -->
+        <section id="discussion-forum">
+            <!-- TODO: Add a sub-heading ('h2') "Discussion" -->
+            <h2>Discussion</h2>
 
             <!-- Subsection 2.1: Existing Comments -->
-            <!-- TODO: Add a container (like a 'div') for the list of comments. -->
-                <!-- TODO: Add 1-2 dummy comments to show the structure. -->
-
-                <!-- Example Comment 1: -->
-                <!-- TODO: Use an 'article' for each comment. -->
-                    <!-- TODO: Use a 'p' for the comment text (e.g., "I have a question about the 'header' tag."). -->
-                    <!-- TODO: Use a 'footer' to show the author (e.g., "Posted by: John Doe"). -->
-                <!-- End of comment article. -->
+            <div id="comment-list">
+                <!-- Example Comment 1 -->
+                <article>
+                    <p>I have a question about the 'header' tag.</p>
+                    <footer>Posted by: John Doe</footer>
+                </article>
+                <!-- Example Comment 2 -->
+                <article>
+                    <p>Can we use multiple 'h1' tags on the same page?</p>
+                    <footer>Posted by: Jane Smith</footer>
+                </article>
+            </div>
 
             <!-- Subsection 2.2: Add a Comment Form -->
-            <!-- TODO: Create a 'form' for users to post new comments. Action can be '#'. -->
-                <!-- TODO: Use a 'fieldset' to group the controls. -->
-                    <!-- TODO: Add a 'legend', e.g., "Ask a Question". -->
+            <form action="#" id="comment-form">
+                <fieldset>
+                    <legend>Ask a Question</legend>
 
-                    <!-- TODO: Add a 'label' and 'textarea' for the comment box.
-                         - label 'for': "new-comment"
-                         - textarea 'id': "new-comment", required -->
-                    
-                    <!-- TODO: Add a 'button' to submit the comment.
-                         - type="submit", Text: "Post Comment" -->
-                <!-- End of fieldset. -->
-            <!-- End of form. -->
-        <!-- End of discussion section. -->
+                    <!-- TODO: Add a 'label' and 'textarea' for the comment box -->
+                    <label for="new-comment">Your Comment:</label>
+                    <textarea id="new-comment" required></textarea>
 
-    <!-- End of main. -->
+                    <!-- TODO: Add a 'button' to submit the comment -->
+                    <button type="submit">Post Comment</button>
+                </fieldset>
+            </form>
+        </section>
+        <!-- End of discussion section -->
+
+    </main>
+    <!-- End of main -->
 </body>
 </html>
-
