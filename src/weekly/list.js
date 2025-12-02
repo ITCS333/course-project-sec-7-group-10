@@ -13,33 +13,62 @@
 
 // --- Element Selections ---
 // TODO: Select the section for the week list ('#week-list-section').
+const listSection = document.querySelector('#week-list-section');
 
 // --- Functions ---
 
 /**
  * TODO: Implement the createWeekArticle function.
- * It takes one week object {id, title, startDate, description}.
- * It should return an <article> element matching the structure in `list.html`.
- * - The "View Details & Discussion" link's `href` MUST be set to `details.html?id=${id}`.
- * (This is how the detail page will know which week to load).
  */
 function createWeekArticle(week) {
-  // ... your implementation here ...
+  const article = document.createElement('article');
+
+  // Week title
+  const h2 = document.createElement('h2');
+  h2.textContent = week.title;
+  article.appendChild(h2);
+
+  // Start date
+  const pDate = document.createElement('p');
+  pDate.textContent = `Starts on: ${week.startDate}`;
+  article.appendChild(pDate);
+
+  // Description
+  const pDesc = document.createElement('p');
+  pDesc.textContent = week.description;
+  article.appendChild(pDesc);
+
+  // Link to details page
+  const a = document.createElement('a');
+  a.href = `details.html?week=${week.id}`;
+  a.textContent = "View Details & Discussion";
+  article.appendChild(a);
+
+  return article;
 }
 
 /**
  * TODO: Implement the loadWeeks function.
- * This function needs to be 'async'.
- * It should:
- * 1. Use `fetch()` to get data from 'weeks.json'.
- * 2. Parse the JSON response into an array.
- * 3. Clear any existing content from `listSection`.
- * 4. Loop through the weeks array. For each week:
- * - Call `createWeekArticle()`.
- * - Append the returned <article> element to `listSection`.
  */
 async function loadWeeks() {
-  // ... your implementation here ...
+  try {
+    const response = await fetch('weeks.json');
+    if (!response.ok) throw new Error('Failed to load weeks.json');
+
+    const weeks = await response.json();
+
+    // Clear existing content
+    listSection.innerHTML = '';
+
+    // Add each week
+    weeks.forEach(week => {
+      const article = createWeekArticle(week);
+      listSection.appendChild(article);
+    });
+  } catch (error) {
+    console.error('Error loading weeks:', error);
+    listSection.textContent = "Failed to load weekly breakdown.";
+  }
 }
 
 // --- Initial Page Load ---
