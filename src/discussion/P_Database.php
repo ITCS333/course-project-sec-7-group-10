@@ -41,6 +41,6 @@ try {
 
     echo "Tables created successfully.\n";
 } catch (PDOException $e) {
-    echo "An error occurred: " . $e->getMessage();
+    die "An error occurred: " . $e->getMessage();
 }
 ?>
