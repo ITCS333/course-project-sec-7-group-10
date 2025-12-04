@@ -22,3 +22,12 @@
 
 
 ## A link to your live, hosted application on Replit.
+
+##Task Ownership & Features.
+| Task | Owner | Features |
+|------|-------|----------|
+| Task 1: Homepage, Admin Portal & User Management | Khulood Hafedh Asheer | - Public homepage<br>- Login system (login/logout/session management)<br>- Admin portal (password management)<br>- Student management (Full CRUD: Create, Read, Update, Delete) |
+| Task 2: Course Resources | Amal Eid Suliman | - Admin view (Full CRUD for resources)<br>- Student view (read-only, view resource details)<br>- Discussion/comments on resources |
+| Task 3: Weekly Breakdown | Hessa Faisal Altemimi | - Admin view (Full CRUD for weekly entries)<br>- Student view (read-only, detailed weekly content)<br>- Discussion/comments on weekly entries |
+| Task 4: Assignments | Zainab Sayed Fuad | - Admin view (Full CRUD for assignments with details & attachments)<br>- Student view (read-only, view assignment details)<br>- Discussion/questions on assignments |
+| Task 5: General Discussion Boards | Lulwa Kamel Almuhanna | - All users can create/read topics<br>- Ownership-based update/delete<br>- Commenting on topics |
