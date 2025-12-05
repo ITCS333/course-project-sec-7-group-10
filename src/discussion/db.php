@@ -1,9 +1,9 @@
 <?php
 class Database {
     private $host = "localhost";
-    private $db_name = "discussion_board";
-    private $username = "root";
-    private $password = "";
+    private $db_name = "course";
+    private $username = "admin";
+    private $password = "password123";
     public $conn;
 
     public function getConnection() {
