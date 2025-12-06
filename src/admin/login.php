@@ -1,5 +1,5 @@
 <?php
-require_once "includes/db.php";
+require_once "../includes/db.php";
 session_start();
 
 $error = '';
@@ -53,3 +53,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 </body>
 </html>
+
