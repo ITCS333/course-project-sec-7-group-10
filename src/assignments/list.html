@@ -1,42 +1,41 @@
-<!--
-  Requirement: Create the Student View for Assignments
-
-  Instructions:
-  This page is a read-only view for students to see all course assignments.
-  Each assignment should link to its dedicated detail page.
--->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- TODO: Add meta tags for charset and viewport. -->
-    
-    <!-- TODO: Add a title, e.g., "Course Assignments". -->
-
-    <!-- TODO: Link to your CSS framework or stylesheet. -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Assignments</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-    <!-- TODO: Create a 'header' with a main heading ('h1') "Course Assignments". -->
+<header>
+    <h1>Course Assignments</h1>
+</header>
 
-    <!-- TODO: Create the 'main' content area. -->
-        <!-- TODO: Create a 'section' to contain the list of assignments. -->
-            <!-- TODO: Add 2-3 dummy assignment entries using the structure below. -->
+<main>
+    <section>
+        <article>
+            <h2>Assignment 1: HTML Basics</h2>
+            <p>Due: 2025-12-20</p>
+            <p>Create a semantic HTML page that includes headings, paragraphs, lists, links, and images.</p>
+            <a href="assignment-detail.html">View Details &amp; Discussion</a>
+        </article>
 
-            <!-- Example Assignment 1: -->
-            <!-- TODO: Use an 'article' element for each assignment. -->
-                <!-- TODO: Add a heading ('h2') for the assignment's title (e.g., "Assignment 1: HTML Basics"). -->
-                <!-- TODO: Add a paragraph ('p') to display the due date, e.g., "Due: YYYY-MM-DD". -->
-                <!-- TODO: Add another paragraph ('p') for a brief description. -->
-                <!-- TODO: Add an anchor tag ('a') that links to the detail page. 
-                     - For now, the 'href' can be "assignment-detail.html".
-                     - The link text should be "View Details & Discussion". -->
-            <!-- End of article. -->
+        <article>
+            <h2>Assignment 2: CSS Layouts</h2>
+            <p>Due: 2026-01-05</p>
+            <p>Build a responsive layout using Flexbox or CSS Grid to structure a multi-section web page.</p>
+            <a href="assignment-detail.html">View Details &amp; Discussion</a>
+        </article>
 
-            <!-- Example Assignment 2: -->
-            <!-- TODO: Create a second 'article' for another assignment with the same structure. -->
-
-        <!-- End of assignment list section. -->
-    <!-- End of main. -->
+        <article>
+            <h2>Assignment 3: JavaScript Interactivity</h2>
+            <p>Due: 2026-01-20</p>
+            <p>Add basic interactivity to a web page using JavaScript events, DOM manipulation, and forms.</p>
+            <a href="assignment-detail.html">View Details &amp; Discussion</a>
+        </article>
+    </section>
+</main>
 
 </body>
 </html>
