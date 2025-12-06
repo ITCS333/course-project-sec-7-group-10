@@ -1,22 +1,31 @@
-<?php include __DIR__ . '/includes/header.php'; ?>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Web Development Course</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-<main>
-    <section>
-        <h1>ITCS333 – Course Portal</h1>
-        <p>Welcome to the official course page for ITCS333. Use this portal to access course information and resources.</p>
+<div class="header-bar">
+    Welcome to the Web Development Course
+</div>
 
-        <p>
-            <a href="login.php">Login</a>
-        </p>
-    </section>
+<div class="container">
+    <h2>Site Navigation</h2>
 
-    <section>
-        <h2>About this Portal</h2>
-        <p>
-            This web application is built as part of the ITCS333 project to practice
-            full-stack development using HTML, CSS, JavaScript, PHP, and MySQL.
-        </p>
-    </section>
-</main>
+    <div class="nav-links">
+        <a href="login.php">Login</a>
+        <a href="students.php">Admin Portal – Manage Students</a>
+        <a href="#">Admin – Manage Resources</a>
+        <a href="#">Admin – Weekly Breakdown</a>
+        <a href="#">Admin – Manage Assignments</a>
 
-<?php include __DIR__ . '/includes/footer.php'; ?>
+        <a href="#">View Course Resources</a>
+        <a href="#">View Weekly Breakdown</a>
+        <a href="#">View Assignments</a>
+        <a href="#">General Discussion Board</a>
+    </div>
+</div>
+
+</body>
+</html>
