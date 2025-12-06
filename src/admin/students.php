@@ -1,8 +1,8 @@
 <?php
-require_once "includes/auth.php";
+require_once "../includes/auth.php";
 checkAdmin();
-require_once "includes/db.php";
-require "includes/header.php";
+require_once "../includes/db.php";
+require "../includes/header.php";
 
 $students = $pdo->query("SELECT * FROM students ORDER BY id DESC")->fetchAll();
 ?>
@@ -39,3 +39,4 @@ $students = $pdo->query("SELECT * FROM students ORDER BY id DESC")->fetchAll();
 </table>
 
 <?php require "footer.php"; ?>
+
