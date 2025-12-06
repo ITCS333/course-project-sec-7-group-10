@@ -1,683 +1,356 @@
 <?php
-/**
- * Discussion Board API
- * 
- * This is a RESTful API that handles all CRUD operations for the discussion board.
- * It manages both discussion topics and their replies.
- * It uses PDO to interact with a MySQL database.
- * 
- * Database Table Structures (for reference):
- * 
- * Table: topics
- * Columns:
- *   - id (INT, PRIMARY KEY, AUTO_INCREMENT)
- *   - topic_id (VARCHAR(50), UNIQUE) - The topic's unique identifier (e.g., "topic_1234567890")
- *   - subject (VARCHAR(255)) - The topic subject/title
- *   - message (TEXT) - The main topic message
- *   - author (VARCHAR(100)) - The author's name
- *   - created_at (TIMESTAMP) - When the topic was created
- * 
- * Table: replies
- * Columns:
- *   - id (INT, PRIMARY KEY, AUTO_INCREMENT)
- *   - reply_id (VARCHAR(50), UNIQUE) - The reply's unique identifier (e.g., "reply_1234567890")
- *   - topic_id (VARCHAR(50)) - Foreign key to topics.topic_id
- *   - text (TEXT) - The reply message
- *   - author (VARCHAR(100)) - The reply author's name
- *   - created_at (TIMESTAMP) - When the reply was created
- * 
- * API Endpoints:
- * 
- * Topics:
- *   GET    /api/discussion.php?resource=topics              - Get all topics (with optional search)
- *   GET    /api/discussion.php?resource=topics&id={id}      - Get single topic
- *   POST   /api/discussion.php?resource=topics              - Create new topic
- *   PUT    /api/discussion.php?resource=topics              - Update a topic
- *   DELETE /api/discussion.php?resource=topics&id={id}      - Delete a topic
- * 
- * Replies:
- *   GET    /api/discussion.php?resource=replies&topic_id={id} - Get all replies for a topic
- *   POST   /api/discussion.php?resource=replies              - Create new reply
- *   DELETE /api/discussion.php?resource=replies&id={id}      - Delete a reply
- * 
- * Response Format: JSON
- */
-$resource = $queryParams['resource'] ?? null;
 
-// TODO: Set headers for JSON response and CORS
-// Set Content-Type to application/json
-// Allow cross-origin requests (CORS) if needed
-// Allow specific HTTP methods (GET, POST, PUT, DELETE, OPTIONS)
-// Allow specific headers (Content-Type, Authorization)
-header("Content-Type: application/json");
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
+header('Content-Type: application/json; charset=utf-8');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, Authorization');
 
-// TODO: Handle preflight OPTIONS request
-// If the request method is OPTIONS, return 200 status and exit
-if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit;
 }
 
-// TODO: Include the database connection class
-// Assume the Database class has a method getConnection() that returns a PDO instance
-require_once 'db.php';  // Including the database connection file
+require_once 'db.php';
 
-// TODO: Get the PDO database connection
-$database = new Database();
-$db = $database->getConnection();
+try {
+    $database = new Database();
+    $db = $database->getConnection();
+    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    http_response_code(500);
+    echo json_encode(['status' => 'error', 'message' => 'Database connection failed']);
+    exit;
+}
 
-// TODO: Get the HTTP request method
+parse_str($_SERVER['QUERY_STRING'] ?? '', $queryParams);
+
 $requestMethod = $_SERVER['REQUEST_METHOD'];
 
-// TODO: Get the request body for POST and PUT requests
-$requestBody = json_decode(file_get_contents('php://input'), true);
+$rawBody = file_get_contents('php://input');
+$requestBody = json_decode($rawBody, true);
+if (!is_array($requestBody)) {
+    $requestBody = [];
+}
 
-// TODO: Parse query parameters for filtering and searching
-parse_str($_SERVER['QUERY_STRING'], $queryParams);
-
-
-// ============================================================================
-// TOPICS FUNCTIONS
-// ============================================================================
-
-/**
- * Function: Get all topics or search for specific topics
- * Method: GET
- * 
- * Query Parameters:
- *   - search: Optional search term to filter by subject, message, or author
- *   - sort: Optional field to sort by (subject, author, created_at)
- *   - order: Optional sort order (asc or desc, default: desc)
- */
 function getAllTopics($db) {
-    // TODO: Initialize base SQL query
-    // Select topic_id, subject, message, author, and created_at (formatted as date)
     $sql = "SELECT topic_id, subject, message, author, DATE_FORMAT(created_at, '%Y-%m-%d') AS created_at FROM topics";
-
-    // TODO: Initialize an array to hold bound parameters
     $params = [];
 
-    // TODO: Check if search parameter exists in $_GET
-    // If yes, add WHERE clause using LIKE for subject, message, OR author
-    // Add the search term to the params array
     if (!empty($_GET['search'])) {
         $sql .= " WHERE subject LIKE ? OR message LIKE ? OR author LIKE ?";
         $searchTerm = "%" . $_GET['search'] . "%";
-        array_push($params, $searchTerm, $searchTerm, $searchTerm);
+        $params = [$searchTerm, $searchTerm, $searchTerm];
     }
 
-    // TODO: Add ORDER BY clause
-    // Check for sort and order parameters in $_GET
-    // Validate the sort field (only allow: subject, author, created_at)
-    // Validate order (only allow: asc, desc)
-    // Default to ordering by created_at DESC
     $validSortFields = ['subject', 'author', 'created_at'];
     $sort = $_GET['sort'] ?? 'created_at';
-    $order = $_GET['order'] ?? 'desc';
-    if (in_array($sort, $validSortFields) && in_array($order, ['asc', 'desc'])) {
-        $sql .= " ORDER BY $sort $order";
-    } else {
-        $sql .= " ORDER BY created_at DESC";
+    $order = strtolower($_GET['order'] ?? 'desc');
+
+    if (!in_array($sort, $validSortFields, true)) {
+        $sort = 'created_at';
+    }
+    if (!in_array($order, ['asc', 'desc'], true)) {
+        $order = 'desc';
     }
 
-    // TODO: Prepare the SQL statement
+    $sql .= " ORDER BY {$sort} {$order}";
+
     $stmt = $db->prepare($sql);
-
-    // TODO: Bind parameters if search was used
-    // Loop through $params array and bind each parameter
-    if (!empty($params)) {
-        foreach ($params as $index => $param) {
-            $stmt->bindValue($index + 1, $param);
-        }
+    foreach ($params as $index => $param) {
+        $stmt->bindValue($index + 1, $param);
     }
-
-    // TODO: Execute the query
     $stmt->execute();
 
-    // TODO: Fetch all results as an associative array
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // TODO: Return JSON response with success status and data
-    // Call sendResponse() helper function or echo json_encode directly
-    echo json_encode(['status' => 'success', 'data' => $results]);
+    sendResponse(['status' => 'success', 'data' => $results]);
 }
 
-
-/**
- * Function: Get a single topic by topic_id
- * Method: GET
- * 
- * Query Parameters:
- *   - id: The topic's unique identifier
- */
 function getTopicById($db, $topicId) {
-    // TODO: Validate that topicId is provided
-    // If empty, return error with 400 status
     if (empty($topicId)) {
-        http_response_code(400);
-        echo json_encode(['status' => 'error', 'message' => 'Topic ID is required.']);
-        return;
+        sendResponse(['status' => 'error', 'message' => 'Topic ID is required.'], 400);
     }
 
-    // TODO: Prepare SQL query to select topic by topic_id
-    // Select topic_id, subject, message, author, and created_at
     $sql = "SELECT topic_id, subject, message, author, DATE_FORMAT(created_at, '%Y-%m-%d') AS created_at FROM topics WHERE topic_id = ?";
-
-    // TODO: Prepare and bind the topic_id parameter
     $stmt = $db->prepare($sql);
     $stmt->bindParam(1, $topicId);
-
-    // TODO: Execute the query
     $stmt->execute();
 
-    // TODO: Fetch the result
     $topic = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // TODO: Check if topic exists
-    // If topic found, return success response with topic data
-    // If not found, return error with 404 status
     if ($topic) {
-        echo json_encode(['status' => 'success', 'data' => $topic]);
+        sendResponse(['status' => 'success', 'data' => $topic]);
     } else {
-        http_response_code(404);
-        echo json_encode(['status' => 'error', 'message' => 'Topic not found.']);
+        sendResponse(['status' => 'error', 'message' => 'Topic not found.'], 404);
     }
 }
 
-
-/**
- * Function: Create a new topic
- * Method: POST
- * 
- * Required JSON Body:
- *   - topic_id: Unique identifier (e.g., "topic_1234567890")
- *   - subject: Topic subject/title
- *   - message: Main topic message
- *   - author: Author's name
- */
 function createTopic($db, $data) {
-    // TODO: Validate required fields
-    // Check if topic_id, subject, message, and author are provided
-    // If any required field is missing, return error with 400 status
     if (empty($data['topic_id']) || empty($data['subject']) || empty($data['message']) || empty($data['author'])) {
-        http_response_code(400);
-        echo json_encode(['status' => 'error', 'message' => 'All fields are required.']);
-        return;
+        sendResponse(['status' => 'error', 'message' => 'All fields are required.'], 400);
     }
 
-    // TODO: Sanitize input data
-    // Trim whitespace from all string fields
-    // Use the sanitizeInput() helper function
-    $topicId = sanitizeInput(trim($data['topic_id']));
-    $subject = sanitizeInput(trim($data['subject']));
-    $message = sanitizeInput(trim($data['message']));
-    $author = sanitizeInput(trim($data['author']));
+    $topicId = sanitizeInput($data['topic_id']);
+    $subject = sanitizeInput($data['subject']);
+    $message = sanitizeInput($data['message']);
+    $author = sanitizeInput($data['author']);
 
-    // TODO: Check if topic_id already exists
-    // Prepare and execute a SELECT query to check for duplicate
-    // If duplicate found, return error with 409 status (Conflict)
     $checkSql = "SELECT topic_id FROM topics WHERE topic_id = ?";
     $checkStmt = $db->prepare($checkSql);
     $checkStmt->bindParam(1, $topicId);
     $checkStmt->execute();
+
     if ($checkStmt->fetch()) {
-        http_response_code(409);
-        echo json_encode(['status' => 'error', 'message' => 'Topic ID already exists.']);
-        return;
+        sendResponse(['status' => 'error', 'message' => 'Topic ID already exists.'], 409);
     }
 
-    // TODO: Prepare INSERT query
-    // Insert topic_id, subject, message, and author
-    // The created_at field should auto-populate with CURRENT_TIMESTAMP
     $insertSql = "INSERT INTO topics (topic_id, subject, message, author) VALUES (?, ?, ?, ?)";
-
-    // TODO: Prepare the statement and bind parameters
     $insertStmt = $db->prepare($insertSql);
     $insertStmt->bindParam(1, $topicId);
     $insertStmt->bindParam(2, $subject);
     $insertStmt->bindParam(3, $message);
     $insertStmt->bindParam(4, $author);
 
-    // TODO: Execute the query
     if ($insertStmt->execute()) {
-        // TODO: Check if insert was successful
-        // If yes, return success response with 201 status (Created)
-        // Include the topic_id in the response
-        echo json_encode(['status' => 'success', 'message' => 'Topic created.', 'topic_id' => $topicId]);
+        sendResponse(['status' => 'success', 'message' => 'Topic created.', 'topic_id' => $topicId], 201);
     } else {
-        // If no, return error with 500 status
-        http_response_code(500);
-        echo json_encode(['status' => 'error', 'message' => 'Failed to create topic.']);
+        sendResponse(['status' => 'error', 'message' => 'Failed to create topic.'], 500);
     }
 }
 
-
-/**
- * Function: Update an existing topic
- * Method: PUT
- * 
- * Required JSON Body:
- *   - topic_id: The topic's unique identifier
- *   - subject: Updated subject (optional)
- *   - message: Updated message (optional)
- */
 function updateTopic($db, $data) {
-    // TODO: Validate that topic_id is provided
-    // If not provided, return error with 400 status
     if (empty($data['topic_id'])) {
-        http_response_code(400);
-        echo json_encode(['status' => 'error', 'message' => 'Topic ID is required.']);
-        return;
+        sendResponse(['status' => 'error', 'message' => 'Topic ID is required.'], 400);
     }
 
-    // TODO: Check if topic exists
-    // Prepare and execute a SELECT query
+    $topicId = sanitizeInput($data['topic_id']);
+
     $checkSql = "SELECT topic_id FROM topics WHERE topic_id = ?";
     $checkStmt = $db->prepare($checkSql);
-    $checkStmt->bindParam(1, $data['topic_id']);
+    $checkStmt->bindParam(1, $topicId);
     $checkStmt->execute();
+
     if (!$checkStmt->fetch()) {
-        // If not found, return error with 404 status
-        http_response_code(404);
-        echo json_encode(['status' => 'error', 'message' => 'Topic not found.']);
-        return;
+        sendResponse(['status' => 'error', 'message' => 'Topic not found.'], 404);
     }
 
-    // TODO: Build UPDATE query dynamically based on provided fields
-    // Only update fields that are provided in the request
     $updates = [];
     $params = [];
+
     if (isset($data['subject'])) {
         $updates[] = "subject = ?";
-        $params[] = sanitizeInput(trim($data['subject']));
+        $params[] = sanitizeInput($data['subject']);
     }
     if (isset($data['message'])) {
         $updates[] = "message = ?";
-        $params[] = sanitizeInput(trim($data['message']));
-    }
-    
-    // TODO: Check if there are any fields to update
-    // If $updates array is empty, return error
-    if (empty($updates)) {
-        http_response_code(400);
-        echo json_encode(['status' => 'error', 'message' => 'No fields to update.']);
-        return;
+        $params[] = sanitizeInput($data['message']);
     }
 
-    // TODO: Complete the UPDATE query
-    $sql = "UPDATE topics SET " . implode(", ", $updates) . " WHERE topic_id = ?";
-    $params[] = $data['topic_id']; // Add topic_id to the params
-    
-    // TODO: Prepare statement and bind parameters
+    if (empty($updates)) {
+        sendResponse(['status' => 'error', 'message' => 'No fields to update.'], 400);
+    }
+
+    $sql = "UPDATE topics SET " . implode(', ', $updates) . " WHERE topic_id = ?";
+    $params[] = $topicId;
+
     $stmt = $db->prepare($sql);
     foreach ($params as $index => $param) {
         $stmt->bindValue($index + 1, $param);
     }
 
-    // TODO: Execute the query
     if ($stmt->execute()) {
-        // TODO: Check if update was successful
-        // If yes, return success response
-        echo json_encode(['status' => 'success', 'message' => 'Topic updated.']);
+        sendResponse(['status' => 'success', 'message' => 'Topic updated.']);
     } else {
-        // If no rows affected, return appropriate message
-        // If error, return error with 500 status
-        http_response_code(500);
-        echo json_encode(['status' => 'error', 'message' => 'Failed to update topic.']);
+        sendResponse(['status' => 'error', 'message' => 'Failed to update topic.'], 500);
     }
 }
 
-
-/**
- * Function: Delete a topic
- * Method: DELETE
- * 
- * Query Parameters:
- *   - id: The topic's unique identifier
- */
 function deleteTopic($db, $topicId) {
-    // TODO: Validate that topicId is provided
-    // If not, return error with 400 status
     if (empty($topicId)) {
-        http_response_code(400);
-        echo json_encode(['status' => 'error', 'message' => 'Topic ID is required.']);
-        return;
+        sendResponse(['status' => 'error', 'message' => 'Topic ID is required.'], 400);
     }
 
-    // TODO: Check if topic exists
-    // Prepare and execute SELECT query
     $checkSql = "SELECT topic_id FROM topics WHERE topic_id = ?";
     $checkStmt = $db->prepare($checkSql);
     $checkStmt->bindParam(1, $topicId);
     $checkStmt->execute();
+
     if (!$checkStmt->fetch()) {
-        // If not found, return error with 404 status
-        http_response_code(404);
-        echo json_encode(['status' => 'error', 'message' => 'Topic not found.']);
-        return;
+        sendResponse(['status' => 'error', 'message' => 'Topic not found.'], 404);
     }
 
-    // TODO: Delete associated replies first (foreign key constraint)
-    // Prepare DELETE query for replies table
     $deleteRepliesSql = "DELETE FROM replies WHERE topic_id = ?";
     $deleteRepliesStmt = $db->prepare($deleteRepliesSql);
     $deleteRepliesStmt->bindParam(1, $topicId);
     $deleteRepliesStmt->execute();
 
-    // TODO: Prepare DELETE query for the topic
     $deleteTopicSql = "DELETE FROM topics WHERE topic_id = ?";
-
-    // TODO: Prepare, bind, and execute
     $deleteTopicStmt = $db->prepare($deleteTopicSql);
     $deleteTopicStmt->bindParam(1, $topicId);
+
     if ($deleteTopicStmt->execute()) {
-        // TODO: Check if delete was successful
-        // If yes, return success response
-        echo json_encode(['status' => 'success', 'message' => 'Topic deleted.']);
+        sendResponse(['status' => 'success', 'message' => 'Topic deleted.']);
     } else {
-        // If no, return error with 500 status
-        http_response_code(500);
-        echo json_encode(['status' => 'error', 'message' => 'Failed to delete topic.']);
+        sendResponse(['status' => 'error', 'message' => 'Failed to delete topic.'], 500);
     }
 }
 
-
-// ============================================================================
-// REPLIES FUNCTIONS
-// ============================================================================
-
-/**
- * Function: Get all replies for a specific topic
- * Method: GET
- * 
- * Query Parameters:
- *   - topic_id: The topic's unique identifier
- */
 function getRepliesByTopicId($db, $topicId) {
-    // TODO: Validate that topicId is provided
-    // If not provided, return error with 400 status
     if (empty($topicId)) {
-        http_response_code(400);
-        echo json_encode(['status' => 'error', 'message' => 'Topic ID is required.']);
-        return;
+        sendResponse(['status' => 'error', 'message' => 'Topic ID is required.'], 400);
     }
 
-    // TODO: Prepare SQL query to select all replies for the topic
-    // Select reply_id, topic_id, text, author, and created_at (formatted as date)
-    // Order by created_at ASC (oldest first)
     $sql = "SELECT reply_id, topic_id, text, author, DATE_FORMAT(created_at, '%Y-%m-%d') AS created_at FROM replies WHERE topic_id = ? ORDER BY created_at ASC";
-
-    // TODO: Prepare and bind the topic_id parameter
     $stmt = $db->prepare($sql);
     $stmt->bindParam(1, $topicId);
-
-    // TODO: Execute the query
     $stmt->execute();
 
-    // TODO: Fetch all results as an associative array
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // TODO: Return JSON response
-    // Even if no replies found, return empty array (not an error)
-    echo json_encode(['status' => 'success', 'data' => $results]);
+    sendResponse(['status' => 'success', 'data' => $results]);
 }
 
-
-/**
- * Function: Create a new reply
- * Method: POST
- * 
- * Required JSON Body:
- *   - reply_id: Unique identifier (e.g., "reply_1234567890")
- *   - topic_id: The parent topic's identifier
- *   - text: Reply message text
- *   - author: Author's name
- */
 function createReply($db, $data) {
-    // TODO: Validate required fields
-    // Check if reply_id, topic_id, text, and author are provided
-    // If any field is missing, return error with 400 status
     if (empty($data['reply_id']) || empty($data['topic_id']) || empty($data['text']) || empty($data['author'])) {
-        http_response_code(400);
-        echo json_encode(['status' => 'error', 'message' => 'All fields are required.']);
-        return;
+        sendResponse(['status' => 'error', 'message' => 'All fields are required.'], 400);
     }
 
-    // TODO: Sanitize input data
-    // Trim whitespace from all fields
-    $replyId = sanitizeInput(trim($data['reply_id']));
-    $topicId = sanitizeInput(trim($data['topic_id']));
-    $text = sanitizeInput(trim($data['text']));
-    $author = sanitizeInput(trim($data['author']));
+    $replyId = sanitizeInput($data['reply_id']);
+    $topicId = sanitizeInput($data['topic_id']);
+    $text = sanitizeInput($data['text']);
+    $author = sanitizeInput($data['author']);
 
-    // TODO: Verify that the parent topic exists
-    // Prepare and execute SELECT query on topics table
-    $checkSql = "SELECT topic_id FROM topics WHERE topic_id = ?";
-    $checkStmt = $db->prepare($checkSql);
-    $checkStmt->bindParam(1, $topicId);
-    $checkStmt->execute();
-    if (!$checkStmt->fetch()) {
-        // If topic doesn't exist, return error with 404 status (can't reply to non-existent topic)
-        http_response_code(404);
-        echo json_encode(['status' => 'error', 'message' => 'Parent topic not found.']);
-        return;
+    $checkTopicSql = "SELECT topic_id FROM topics WHERE topic_id = ?";
+    $checkTopicStmt = $db->prepare($checkTopicSql);
+    $checkTopicStmt->bindParam(1, $topicId);
+    $checkTopicStmt->execute();
+
+    if (!$checkTopicStmt->fetch()) {
+        sendResponse(['status' => 'error', 'message' => 'Parent topic not found.'], 404);
     }
 
-    // TODO: Check if reply_id already exists
-    // Prepare and execute SELECT query to check for duplicate
-    // If duplicate found, return error with 409 status
     $checkReplySql = "SELECT reply_id FROM replies WHERE reply_id = ?";
     $checkReplyStmt = $db->prepare($checkReplySql);
     $checkReplyStmt->bindParam(1, $replyId);
     $checkReplyStmt->execute();
+
     if ($checkReplyStmt->fetch()) {
-        http_response_code(409);
-        echo json_encode(['status' => 'error', 'message' => 'Reply ID already exists.']);
-        return;
+        sendResponse(['status' => 'error', 'message' => 'Reply ID already exists.'], 409);
     }
 
-    // TODO: Prepare INSERT query
-    // Insert reply_id, topic_id, text, and author
     $insertSql = "INSERT INTO replies (reply_id, topic_id, text, author) VALUES (?, ?, ?, ?)";
-
-    // TODO: Prepare statement and bind parameters
     $insertStmt = $db->prepare($insertSql);
     $insertStmt->bindParam(1, $replyId);
     $insertStmt->bindParam(2, $topicId);
     $insertStmt->bindParam(3, $text);
     $insertStmt->bindParam(4, $author);
 
-    // TODO: Execute the query
     if ($insertStmt->execute()) {
-        // TODO: Check if insert was successful
-        // If yes, return success response with 201 status
-        // Include the reply_id in the response
-        echo json_encode(['status' => 'success', 'message' => 'Reply created.', 'reply_id' => $replyId]);
+        sendResponse(['status' => 'success', 'message' => 'Reply created.', 'reply_id' => $replyId], 201);
     } else {
-        // If no, return error with 500 status
-        http_response_code(500);
-        echo json_encode(['status' => 'error', 'message' => 'Failed to create reply.']);
+        sendResponse(['status' => 'error', 'message' => 'Failed to create reply.'], 500);
     }
 }
 
-
-/**
- * Function: Delete a reply
- * Method: DELETE
- * 
- * Query Parameters:
- *   - id: The reply's unique identifier
- */
 function deleteReply($db, $replyId) {
-    // TODO: Validate that replyId is provided
-    // If not, return error with 400 status
     if (empty($replyId)) {
-        http_response_code(400);
-        echo json_encode(['status' => 'error', 'message' => 'Reply ID is required.']);
-        return;
+        sendResponse(['status' => 'error', 'message' => 'Reply ID is required.'], 400);
     }
 
-    // TODO: Check if reply exists
-    // Prepare and execute SELECT query
     $checkSql = "SELECT reply_id FROM replies WHERE reply_id = ?";
     $checkStmt = $db->prepare($checkSql);
     $checkStmt->bindParam(1, $replyId);
     $checkStmt->execute();
+
     if (!$checkStmt->fetch()) {
-        // If not found, return error with 404 status
-        http_response_code(404);
-        echo json_encode(['status'=> 'error', 'message' => 'Reply not found.']);
-        return;
+        sendResponse(['status' => 'error', 'message' => 'Reply not found.'], 404);
     }
 
-    // TODO: Prepare DELETE query
     $deleteSql = "DELETE FROM replies WHERE reply_id = ?";
-
-    // TODO: Prepare, bind, and execute
     $deleteStmt = $db->prepare($deleteSql);
     $deleteStmt->bindParam(1, $replyId);
-    
+
     if ($deleteStmt->execute()) {
-        // TODO: Check if delete was successful
-        // If yes, return success response
-        echo json_encode(['status' => 'success', 'message' => 'Reply deleted.']);
+        sendResponse(['status' => 'success', 'message' => 'Reply deleted.']);
     } else {
-        // If no, return error with 500 status
-        http_response_code(500);
-        echo json_encode(['status' => 'error', 'message' => 'Failed to delete reply.']);
+        sendResponse(['status' => 'error', 'message' => 'Failed to delete reply.'], 500);
     }
 }
-// ============================================================================
-// MAIN REQUEST ROUTER
-// ============================================================================
 
-try {
-    // TODO: Route the request based on resource and HTTP method
-    $resource = $queryParams['resource'] ?? null; // Assume resource is provided as a query parameter
-
-    // TODO: For invalid resources, return 400 Bad Request
-    if (!isValidResource($resource)) {
-        http_response_code(400);
-        echo json_encode(["message" => "Bad Request: Invalid resource."]);
-        exit;
-    }
-
-    if ($requestMethod === 'GET') {
-        if (isset($queryParams['id'])) {
-    // TODO: For GET requests, check for 'id' parameter in queryParams ($_GET)
-            // GET single topic by id
-            getTopicById($db, $queryParams['id']);
-        } else {
-            // GET all topics or search topics
-            getAllTopics($db);
-        }
-    } elseif ($requestMethod === 'POST') {
-        // Create new topic
-        createTopic($db, $requestBody);
-    } elseif ($requestMethod === 'PUT') {
-        // Update an existing topic
-        // Ensure 'id' is provided for update
-        if (empty($requestBody['topic_id'])) {
-            http_response_code(400);
-            echo json_encode(["message" => "Bad Request: Topic ID is required for update."]);
-            exit;
-        }
-        updateTopic($db, $requestBody);
-    } elseif ($requestMethod === 'DELETE') {
-    // TODO: For DELETE requests, get id from query parameter or request body
-    // Ensure 'id' is provided
-        $topicId = $queryParams['id'] ?? ($requestBody['topic_id'] ?? null);
-        
-        if (empty($topicId)) {
-            http_response_code(400);
-            echo json_encode(["message" => "Bad Request: Topic ID is required for deletion."]);
-            exit;
-        }
-
-        // Delete a topic
-        deleteTopic($db, $topicId);
-    } else {
-    // TODO: For unsupported methods, return 405 Method Not Allowed
-        http_response_code(405);
-        echo json_encode(["message" => "Method Not Allowed"]);
-    }
-} catch (PDOException $e) {
-    // TODO: Handle database errors
-    // DO NOT expose the actual error message to the client (security risk)
-    // Log the error for debugging (optional)
-    // Return generic error response with 500 status
-    http_response_code(500);
-    sendResponse(["message" => "Internal Server Error"]);
-} catch (Exception $e) {
-    // TODO: Handle general errors
-    // Log the error for debugging
-    // Return error response with 500 status
-    http_response_code(500);
-    sendResponse(["message" => "Internal Server Error"]);
-}
-
-// ============================================================================
-// HELPER FUNCTIONS
-// ============================================================================
-
-/**
- * Helper function to send JSON response and exit
- * 
- * @param mixed $data - Data to send (will be JSON encoded)
- * @param int $statusCode - HTTP status code (default: 200)
- */
 function sendResponse($data, $statusCode = 200) {
-    // TODO: Set HTTP response code
-    // TODO: Echo JSON encoded data
-    // Make sure to handle JSON encoding errors
-    // TODO: Exit to prevent further execution
     http_response_code($statusCode);
     echo json_encode($data);
     exit;
 }
 
-/**
- * Helper function to sanitize string input
- * 
- * @param string $data - Data to sanitize
- * @return string - Sanitized data
- */
 function sanitizeInput($data) {
-    // TODO: Check if data is a string
     if (!is_string($data)) {
-        return (string)$data; // Convert to string if not
+        $data = (string) $data;
     }
-
-    // TODO: Trim whitespace from both ends
     $data = trim($data);
-
-    // TODO: Remove HTML and PHP tags
     $data = strip_tags($data);
-
-    // TODO: Convert special characters to HTML entities (prevents XSS)
     $data = htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
-
-    // TODO: Return sanitized data
     return $data;
 }
 
-
-/**
- * Helper function to validate resource name
- * 
- * @param string $resource - Resource name to validate
- * @return bool - True if valid, false otherwise
- */
 function isValidResource($resource) {
-    // TODO: Define allowed resources
-    $allowedResources = ['topics', 'replies', 'users']; // Example resources
-
-    // TODO: Check if resource is in the allowed list
-    return in_array($resource, $allowedResources);
+    $allowedResources = ['topics', 'replies'];
+    return in_array($resource, $allowedResources, true);
 }
 
+try {
+    $resource = $queryParams['resource'] ?? null;
+
+    if (!isValidResource($resource)) {
+        sendResponse(['message' => 'Bad Request: Invalid resource.'], 400);
+    }
+
+    if ($resource === 'topics') {
+        if ($requestMethod === 'GET') {
+            if (!empty($queryParams['id'])) {
+                getTopicById($db, $queryParams['id']);
+            } else {
+                getAllTopics($db);
+            }
+        } elseif ($requestMethod === 'POST') {
+            createTopic($db, $requestBody);
+        } elseif ($requestMethod === 'PUT') {
+            if (empty($requestBody['topic_id'])) {
+                sendResponse(['message' => 'Bad Request: Topic ID is required for update.'], 400);
+            }
+            updateTopic($db, $requestBody);
+        } elseif ($requestMethod === 'DELETE') {
+            $topicId = $queryParams['id'] ?? ($requestBody['topic_id'] ?? null);
+            if (empty($topicId)) {
+                sendResponse(['message' => 'Bad Request: Topic ID is required for deletion.'], 400);
+            }
+            deleteTopic($db, $topicId);
+        } else {
+            sendResponse(['message' => 'Method Not Allowed'], 405);
+        }
+    } elseif ($resource === 'replies') {
+        if ($requestMethod === 'GET') {
+            $topicId = $queryParams['topic_id'] ?? null;
+            if (empty($topicId)) {
+                sendResponse(['status' => 'error', 'message' => 'Topic ID is required.'], 400);
+            }
+            getRepliesByTopicId($db, $topicId);
+        } elseif ($requestMethod === 'POST') {
+            createReply($db, $requestBody);
+        } elseif ($requestMethod === 'DELETE') {
+            $replyId = $queryParams['id'] ?? ($requestBody['reply_id'] ?? null);
+            if (empty($replyId)) {
+                sendResponse(['message' => 'Bad Request: Reply ID is required for deletion.'], 400);
+            }
+            deleteReply($db, $replyId);
+        } else {
+            sendResponse(['message' => 'Method Not Allowed'], 405);
+        }
+    }
+} catch (PDOException $e) {
+    sendResponse(['message' => 'Internal Server Error'], 500);
+} catch (Exception $e) {
+    sendResponse(['message' => 'Internal Server Error'], 500);
+}
 
 ?>
