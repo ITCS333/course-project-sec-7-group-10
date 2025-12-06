@@ -1,8 +1,9 @@
 <?php
-$host = 'localhost';
-$db   = 'itcs333_course';
-$user = 'root';
-$pass = ''; // change if needed
+private $host = 'localhost';
+private $db   = 'course';
+private $username = 'admin';
+private $password = 'password123'; // change if needed
+public $conn;
 $charset = 'utf8mb4';
 
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
@@ -17,3 +18,4 @@ try {
 } catch (PDOException $e) {
     die('Database connection failed: ' . $e->getMessage());
 }
+
