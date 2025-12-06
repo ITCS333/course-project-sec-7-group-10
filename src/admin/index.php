@@ -1,22 +1,32 @@
-<?php include __DIR__ . '/includes/header.php'; ?>
+<?php
+require __DIR__ . '/../includes/db.php';
+require __DIR__ . '/../includes/auth.php';
+require_admin();
 
-<main>
-    <section>
-        <h1>ITCS333 – Course Portal</h1>
-        <p>Welcome to the official course page for ITCS333. Use this portal to access course information and resources.</p>
+// Optional: get number of students
+$stmt = $pdo->query("SELECT COUNT(*) AS total_students FROM users WHERE role = 'student'");
+$stats = $stmt->fetch();
+$total_students = $stats['total_students'] ?? 0;
 
-        <p>
-            <a href="login.php">Login</a>
-        </p>
-    </section>
+include __DIR__ . '/../includes/header.php';
+?>
 
-    <section>
-        <h2>About this Portal</h2>
-        <p>
-            This web application is built as part of the ITCS333 project to practice
-            full-stack development using HTML, CSS, JavaScript, PHP, and MySQL.
-        </p>
-    </section>
-</main>
+<h1>Admin Dashboard</h1>
 
-<?php include __DIR__ . '/includes/footer.php'; ?>
+<p>Welcome, <?= htmlspecialchars($_SESSION['name']) ?>!</p>
+
+<section>
+    <h2>Quick Actions</h2>
+    <ul>
+        <li><a href="students.php">Manage Students</a></li>
+        <li><a href="student_create.php">Add New Student</a></li>
+        <li><a href="change_password.php">Change My Password</a></li>
+    </ul>
+</section>
+
+<section>
+    <h2>Overview</h2>
+    <p>Total registered students: <strong><?= $total_students ?></strong></p>
+</section>
+
+<?php include __DIR__ . '/../includes/footer.php'; ?>
