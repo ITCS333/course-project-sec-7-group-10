@@ -1,65 +1,65 @@
-<!--
-  Requirement: Create the Dedicated Page for a Single Assignment
-
-  Instructions:
-  This page displays the full details for one assignment and allows for discussion.
--->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- TODO: Add meta tags for charset and viewport. -->
-    
-    <!-- TODO: Add a title, for now use "Assignment Details". -->
-
-    <!-- TODO: Link to your CSS framework or stylesheet. -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignment Details</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- TODO: Create a 'header' with a main heading ('h1'). Use a dummy title like "Assignment 1: HTML Basics". -->
 
-    <!-- TODO: Create the 'main' content area. -->
+<header>
+    <h1>Assignment 1: HTML Basics</h1>
+</header>
 
-        <!-- Section 1: Assignment Information -->
-        <!-- TODO: Use an 'article' to display the main assignment information. -->
-            <!-- TODO: Add a paragraph ('p') to display the due date, e.g., "Due: YYYY-MM-DD". -->
-            <!-- TODO: Add a sub-heading ('h2') "Description". -->
-            <!-- TODO: Add a paragraph ('p') with dummy text for the assignment's detailed description. -->
+<main>
 
-            <!-- TODO: Add another sub-heading ('h2') "Attached Files & Links". -->
-            <!-- TODO: Use an unordered list ('ul') to display the links. -->
-                <!-- TODO: Add list items ('li') with anchor tags ('a') for each resource. Use dummy links for now. -->
-                <!-- Example: <li><a href="#">assignment-brief.pdf</a></li> -->
-            <!-- End of the list. -->
-        <!-- End of article. -->
+    <article>
+        <p>Due: 2025-12-20</p>
 
-        <!-- Section 2: Discussion Forum -->
-        <!-- TODO: Create a 'section' for the discussion, with an 'id' of "discussion-forum". -->
-            <!-- TODO: Add a sub-heading ('h2') "Questions & Discussion". -->
+        <h2>Description</h2>
+        <p>
+            In this assignment, you will create a simple, semantic HTML page that includes headings,
+            paragraphs, lists, links, and images. Focus on using the correct HTML elements for the
+            correct purpose and ensuring that your structure is easy to read and maintain.
+        </p>
 
-            <!-- Subsection 2.1: Existing Comments -->
-            <!-- TODO: Add a container (like a 'div') for the list of comments. -->
-                <!-- TODO: Add 1-2 dummy comments to show the structure. -->
+        <h2>Attached Files &amp; Links</h2>
+        <ul>
+            <li><a href="#">assignment-brief.pdf</a></li>
+            <li><a href="#">html-basics-reference.html</a></li>
+            <li><a href="#">submission-instructions.txt</a></li>
+        </ul>
+    </article>
 
-                <!-- Example Comment 1: -->
-                <!-- TODO: Use an 'article' for each comment. -->
-                    <!-- TODO: Use a 'p' for the comment text (e.g., "Is it okay to use a 'section' inside an 'article'?"). -->
-                    <!-- TODO: Use a 'footer' to show the author (e.g., "Posted by: Jane Smith"). -->
-                <!-- End of comment article. -->
+    <section id="discussion-forum">
+        <h2>Questions &amp; Discussion</h2>
 
-            <!-- Subsection 2.2: Add a Comment Form -->
-            <!-- TODO: Create a 'form' for users to post new comments. Action can be '#'. -->
-                <!-- TODO: Use a 'fieldset' to group the controls. -->
-                    <!-- TODO: Add a 'legend', e.g., "Ask a Question". -->
+        <div class="comments">
+            <article class="comment">
+                <p>Is it okay to use a <code>&lt;section&gt;</code> inside an <code>&lt;article&gt;</code> for different parts of my content?</p>
+                <footer>Posted by: Jane Smith</footer>
+            </article>
 
-                    <!-- TODO: Add a 'label' and 'textarea' for the comment box.
-                         - label 'for': "new-comment"
-                         - textarea 'id': "new-comment", required -->
-                    
-                    <!-- TODO: Add a 'button' to submit the comment.
-                         - type="submit", Text: "Post Comment" -->
-                <!-- End of fieldset. -->
-            <!-- End of form. -->
-        <!-- End of discussion section. -->
+            <article class="comment">
+                <p>Do we need to include images in this assignment, or are text-only pages acceptable?</p>
+                <footer>Posted by: Ahmed Ali</footer>
+            </article>
+        </div>
 
-    <!-- End of main. -->
+        <form action="#" method="post">
+            <fieldset>
+                <legend>Ask a Question</legend>
+
+                <label for="new-comment">Your Comment</label>
+                <textarea id="new-comment" name="new-comment" rows="4" required></textarea>
+
+                <button type="submit">Post Comment</button>
+            </fieldset>
+        </form>
+    </section>
+
+</main>
+
 </body>
 </html>
