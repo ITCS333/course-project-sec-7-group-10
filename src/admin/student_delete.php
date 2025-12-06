@@ -1,18 +1,12 @@
 <?php
-require __DIR__ . '/../includes/db.php';
-require __DIR__ . '/../includes/auth.php';
-require_admin();
+require_once "includes/auth.php";
+checkAdmin();
+require_once "includes/db.php";
 
-$id = $_GET['id'] ?? null;
+$id = $_GET['id'];
 
-if (!$id) {
-    header('Location: students.php');
-    exit;
-}
+$stmt = $pdo->prepare("DELETE FROM students WHERE id=?");
+$stmt->execute([$id]);
 
-// Delete only if user is a student
-$stmt = $pdo->prepare("DELETE FROM users WHERE id = :id AND role = 'student'");
-$stmt->execute([':id' => $id]);
-
-header('Location: students.php');
+header("Location: students.php");
 exit;
