@@ -1,21 +1,24 @@
 <?php
-private $host = 'localhost';
-private $db   = 'course';
-private $username = 'admin';
-private $password = 'password123'; // change if needed
-public $conn;
-$charset = 'utf8mb4';
 
-$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+function getDBConnection() {
+    $host = 'localhost';
+    $db   = 'course';
+    $username = 'admin';
+    $password = 'password123';  
+    $charset = 'utf8mb4';
 
-$options = [
-    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-];
+    $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
 
-try {
-    $pdo = new PDO($dsn, $user, $pass, $options);
-} catch (PDOException $e) {
-    die('Database connection failed: ' . $e->getMessage());
+    $options = [
+        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    ];
+
+    try {
+        return new PDO($dsn, $username, $password, $options);
+    } catch (PDOException $e) {
+        die("Database connection failed: " . $e->getMessage());
+    }
 }
 
+?>
