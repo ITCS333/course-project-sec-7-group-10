@@ -1,88 +1,46 @@
-<!--
-  Requirement: Create the Dedicated Page for a Single Week
-
-  Instructions:
-  This page displays the full details for one week and allows for discussion.
--->
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- TODO: Add meta tags for charset and viewport. -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- TODO: Add a title, for now use "Week Details". -->
     <title>Week Details</title>
-
-    <!-- TODO: Link to your CSS framework or stylesheet. -->
-    <link rel="stylesheet" href="styles333.css">
+    <link rel="stylesheet" href="styles.css">
+    <script src="details.js" defer></script>
 </head>
 <body>
-    <!-- TODO: Create a 'header' with a main heading ('h1'). -->
-    <header>
-        <h1>Week 1: Introduction to HTML</h1>
-    </header>
 
-    <!-- TODO: Create the 'main' content area. -->
-    <main>
+<header>
+    <h1 id="week-title"></h1>
+</header>
 
-        <!-- Section 1: Weekly Information -->
-        <article>
-            <!-- TODO: Add a paragraph ('p') to display the start date -->
-            <p>Starts on: 2025-09-01</p>
+<main>
+    <article>
+        <p id="week-start-date"></p>
 
-            <!-- TODO: Add a sub-heading ('h2') "Description & Notes" -->
-            <h2>Description & Notes</h2>
-            <!-- TODO: Add a paragraph ('p') with dummy text for the week's detailed notes -->
-            <p>This week focuses on understanding the basics of HTML, including page structure, semantic tags, and simple content creation.</p>
+        <h2>Description & Notes</h2>
+        <p id="week-description"></p>
 
-            <!-- TODO: Add another sub-heading ('h2') "Exercises & Resources" -->
-            <h2>Exercises & Resources</h2>
-            <!-- TODO: Use an unordered list ('ul') to display the links for the week -->
-            <ul>
-                <li><a href="#">Exercise 1 - Basic Tags</a></li>
-                <li><a href="#">Exercise 2 - Creating Lists</a></li>
-                <li><a href="#">Resource - HTML Reference</a></li>
-            </ul>
-        </article>
-        <!-- End of article -->
+        <h2>Exercises & Resources</h2>
+        <ul id="week-links-list"></ul>
+    </article>
 
-        <!-- Section 2: Discussion Forum -->
-        <section id="discussion-forum">
-            <!-- TODO: Add a sub-heading ('h2') "Discussion" -->
-            <h2>Discussion</h2>
+    <section id="discussion-forum">
+        <h2>Discussion</h2>
 
-            <!-- Subsection 2.1: Existing Comments -->
-            <div id="comment-list">
-                <!-- Example Comment 1 -->
-                <article>
-                    <p>I have a question about the 'header' tag.</p>
-                    <footer>Posted by: John Doe</footer>
-                </article>
-                <!-- Example Comment 2 -->
-                <article>
-                    <p>Can we use multiple 'h1' tags on the same page?</p>
-                    <footer>Posted by: Jane Smith</footer>
-                </article>
-            </div>
+        <div id="comment-list"></div>
 
-            <!-- Subsection 2.2: Add a Comment Form -->
-            <form action="#" id="comment-form">
-                <fieldset>
-                    <legend>Ask a Question</legend>
+        <form id="comment-form">
+            <fieldset>
+                <legend>Ask a Question</legend>
 
-                    <!-- TODO: Add a 'label' and 'textarea' for the comment box -->
-                    <label for="new-comment">Your Comment:</label>
-                    <textarea id="new-comment" required></textarea>
+                <label for="new-comment-text">Your Comment:</label>
+                <textarea id="new-comment-text" required></textarea>
 
-                    <!-- TODO: Add a 'button' to submit the comment -->
-                    <button type="submit">Post Comment</button>
-                </fieldset>
-            </form>
-        </section>
-        <!-- End of discussion section -->
+                <button type="submit">Post Comment</button>
+            </fieldset>
+        </form>
+    </section>
+</main>
 
-    </main>
-    <!-- End of main -->
 </body>
 </html>
