@@ -45,36 +45,23 @@
                     <!-- TODO: Add a 'legend', e.g., "Resource Details". -->
                     <legend>Resource Details</legend>
 
-                    <!-- TODO: Add a 'label' and 'input' for the resource title.
-                         - label 'for': "resource-title"
-                         - input 'id': "resource-title", type="text", required -->
+                    <!-- TODO: Add a 'label' and 'input' for the resource title. -->
                     <label for="resource-title">Title:</label>
                     <input id="resource-title" type="text" required>
 
-                    <!-- TODO: Add a 'label' and 'textarea' for the resource description.
-                         - label 'for': "resource-description"
-                         - textarea 'id': "resource-description" -->
+                    <!-- TODO: Add a 'label' and 'textarea' for the resource description. -->
                     <label for="resource-description">Description:</label>
                     <textarea id="resource-description"></textarea>
 
-                    <!-- TODO: Add a 'label' and 'input' for the resource link.
-                         - label 'for': "resource-link"
-                         - input 'id': "resource-link", type="url", required -->
+                    <!-- TODO: Add a 'label' and 'input' for the resource link. -->
                     <label for="resource-link">Resource Link:</label>
                     <input id="resource-link" type="url" required>
 
-                    <!-- TODO: Add a 'button' to submit the form.
-                         - id="add-resource", type="submit", Text: "Add Resource" -->
+                    <!-- TODO: Add a 'button' to submit the form. -->
                     <button id="add-resource" type="submit">Add Resource</button>
-
-                <!-- End of fieldset. -->
                 </fieldset>
-            <!-- End of form. -->
             </form>
-        <!-- End of form section. -->
         </section>
-
-
 
         <!-- Section 2: Existing Resources List -->
         <!-- TODO: Create a 'section' to display the list of current resources. -->
@@ -84,60 +71,19 @@
 
             <!-- TODO: Create a 'table' with id "resources-table". -->
             <table id="resources-table">
-                <!-- TODO: Create a 'thead' and a 'tr' inside it. -->
                 <thead>
                     <tr>
-                        <!-- TODO: Add 'th' elements for "Title", "Description", and "Actions". -->
                         <th>Title</th>
                         <th>Description</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
-
-                <!-- TODO: Create a 'tbody' for the data. -->
-                <tbody>
-                    <!-- Example Row 1: -->
-                    <!-- TODO: Create a 'tr' for the first resource. -->
-                    <tr>
-                        <!-- TODO: Add 'td' cells for a title (e.g., "Chapter 1 Notes") and a description. -->
-                        <td>Chapter 1 Notes</td>
-                        <td>Introduction to course basics.</td>
-
-                        <!-- TODO: Add a 'td' containing the action buttons. -->
-                        <td>
-                            <!-- TODO: Add an "Edit" button. -->
-                            <button>Edit</button>
-                            <!-- TODO: Add a "Delete" button. -->
-                            <button>Delete</button>
-                        </td>
-                        <!-- End of actions 'td'. -->
-                    </tr>
-                    <!-- End of the row. -->
-
-                    <!-- Example Row 2: -->
-                    <tr>
-                        <!-- TODO: Add 'td' cells for the title and description. -->
-                        <td>Website Tutorial</td>
-                        <td>External link to a helpful guide.</td>
-
-                        <!-- TODO: Add a 'td' with "Edit" and "Delete" buttons. -->
-                        <td>
-                            <button>Edit</button>
-                            <button>Delete</button>
-                        </td>
-                    </tr>
-                    <!-- End of the row. -->
-
-                <!-- End of tbody. -->
-                </tbody>
-
-            <!-- End of table. -->
+                <tbody id="resources-tbody"></tbody>
             </table>
-        <!-- End of resources list section. -->
         </section>
 
-    <!-- End of main. -->
     </main>
 
+    <script src="admin.js" defer></script>
 </body>
 </html>
