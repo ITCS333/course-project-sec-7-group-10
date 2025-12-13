@@ -1,70 +1,21 @@
-<!--
-  Requirement: Create the Student View for the Weekly Breakdown
-
-  Instructions:
-  This page is a read-only view for students to see the plan for all weeks.
-  Each week should link to its dedicated detail page.
--->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-   <!-- TODO: Add meta tags for charset and viewport. -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- TODO: Add a title, e.g., "Weekly Course Breakdown". -->
     <title>Weekly Course Breakdown</title>
-
-    <!-- TODO: Link to your CSS framework or stylesheet. -->
-    <link rel="stylesheet" href="styles333.css">
+    <link rel="stylesheet" href="styles.css">
+    <script src="list.js" defer></script>
 </head>
 <body>
 
-    <!-- TODO: Create a 'header' with a main heading ('h1') "Weekly Course Breakdown". -->
-    <header>
-        <h1>Weekly Course Breakdown</h1>
-    </header>
+<header>
+    <h1>Weekly Course Breakdown</h1>
+</header>
 
-    <!-- TODO: Create the 'main' content area. -->
-    <main>
-        <!-- TODO: Create a 'section' to contain the list of weeks. -->
-        <section class="weeks-list">
-
-            <!-- Example Week 1: -->
-            <article>
-                <!-- TODO: Add a heading ('h2') for the week's title -->
-                <h2>Week 1: Introduction to HTML</h2>
-                <!-- TODO: Add a paragraph ('p') to display the start date -->
-                <p>Starts on: 2025-09-01</p>
-                <!-- TODO: Add a paragraph ('p') for a brief description -->
-                <p>This week covers the basics of HTML structure, elements, and semantic tags.</p>
-                <!-- TODO: Add an anchor tag ('a') that links to the detail page -->
-                <a href="week-detail.html?week=1">View Details & Discussion</a>
-            </article>
-            <!-- End of article. -->
-
-            <!-- Example Week 2: -->
-            <article>
-                <h2>Week 2: HTML Tags</h2>
-                <p>Starts on: 2025-09-08</p>
-                <p>This week focuses on common HTML tags, attributes, and page structure.</p>
-                <a href="week-detail.html?week=2">View Details & Discussion</a>
-            </article>
-            <!-- End of article. -->
-
-            <!-- Example Week 3: -->
-            <article>
-                <h2>Week 3: CSS Basics</h2>
-                <p>Starts on: 2025-09-15</p>
-                <p>Learn how to style your web pages with CSS, including colors, fonts, and layouts.</p>
-                <a href="week-detail.html?week=3">View Details & Discussion</a>
-            </article>
-            <!-- End of article. -->
-
-        </section>
-        <!-- End of weekly list section. -->
-    </main>
-    <!-- End of main. -->
+<main>
+    <section id="week-list-section"></section>
+</main>
 
 </body>
 </html>
