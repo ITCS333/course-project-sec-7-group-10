@@ -5,6 +5,15 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 
+// ==================== Session Variables ====================
+if (!isset($_SESSION['user_id'])) {
+    $_SESSION['user_id'] = 1;
+}
+if (!isset($_SESSION['role'])) {
+    $_SESSION['role'] = 'admin';
+}
+
+// ==================== Handle OPTIONS ====================
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit;
@@ -30,27 +39,76 @@ if (!is_array($requestBody)) {
     $requestBody = [];
 }
 
-// ==================== دوال Topics و Replies ====================
+// ==================== دوال Topics ====================
+function getAllTopics($db) {
+    $stmt = $db->prepare("SELECT * FROM topics");
+    $stmt->execute();
+    $topics = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    echo json_encode($topics);
+}
 
-function getAllTopics($db) { /* ... نفس كودك ... */ }
-function getTopicById($db, $topicId) { /* ... نفس كودك ... */ }
-function createTopic($db, $data) { /* ... نفس كودك ... */ }
-function updateTopic($db, $data) { /* ... نفس كودك ... */ }
-function deleteTopic($db, $topicId) { /* ... نفس كودك ... */ }
-function getRepliesByTopicId($db, $topicId) { /* ... نفس كودك ... */ }
-function createReply($db, $data) { /* ... نفس كودك ... */ }
-function deleteReply($db, $replyId) { /* ... نفس كودك ... */ }
-function sendResponse($data, $statusCode = 200) { /* ... نفس كودك ... */ }
-function sanitizeInput($data) { /* ... نفس كودك ... */ }
-function isValidResource($resource) { /* ... نفس كودك ... */ }
+function getTopicById($db, $topicId) {
+    $stmt = $db->prepare("SELECT * FROM topics WHERE topic_id = ?");
+    $stmt->execute([$topicId]);
+    $topic = $stmt->fetch(PDO::FETCH_ASSOC);
+    echo json_encode($topic);
+}
+
+function createTopic($db, $data) {
+    $stmt = $db->prepare("INSERT INTO topics (title, content, user_id) VALUES (?, ?, ?)");
+    $stmt->execute([$data['title'], $data['content'], $_SESSION['user_id']]);
+    echo json_encode(['success' => true, 'message' => 'Topic created']);
+}
+
+function updateTopic($db, $data) {
+    $stmt = $db->prepare("UPDATE topics SET title = ?, content = ? WHERE topic_id = ?");
+    $stmt->execute([$data['title'], $data['content'], $data['topic_id']]);
+    echo json_encode(['success' => true, 'message' => 'Topic updated']);
+}
+
+function deleteTopic($db, $topicId) {
+    $stmt = $db->prepare("DELETE FROM topics WHERE topic_id = ?");
+    $stmt->execute([$topicId]);
+    echo json_encode(['success' => true, 'message' => 'Topic deleted']);
+}
+
+// ==================== دوال Replies ====================
+function getRepliesByTopicId($db, $topicId) {
+    $stmt = $db->prepare("SELECT * FROM replies WHERE topic_id = ?");
+    $stmt->execute([$topicId]);
+    $replies = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    echo json_encode($replies);
+}
+
+function createReply($db, $data) {
+    $stmt = $db->prepare("INSERT INTO replies (topic_id, content, user_id) VALUES (?, ?, ?)");
+    $stmt->execute([$data['topic_id'], $data['content'], $_SESSION['user_id']]);
+    echo json_encode(['success' => true, 'message' => 'Reply created']);
+}
+
+function deleteReply($db, $replyId) {
+    $stmt = $db->prepare("DELETE FROM replies WHERE reply_id = ?");
+    $stmt->execute([$replyId]);
+    echo json_encode(['success' => true, 'message' => 'Reply deleted']);
+}
+
+// ==================== Helpers ====================
+function sendResponse($data, $statusCode = 200) {
+    http_response_code($statusCode);
+    echo json_encode($data);
+}
+
+function isValidResource($resource) {
+    return in_array($resource, ['topics', 'replies']);
+}
 
 // ==================== معالجة الطلب ====================
-
 try {
     $resource = $queryParams['resource'] ?? null;
 
     if (!isValidResource($resource)) {
         sendResponse(['message' => 'Bad Request: Invalid resource.'], 400);
+        exit;
     }
 
     if ($resource === 'topics') {
@@ -59,23 +117,23 @@ try {
             else getAllTopics($db);
         } elseif ($requestMethod === 'POST') createTopic($db, $requestBody);
         elseif ($requestMethod === 'PUT') {
-            if (empty($requestBody['topic_id'])) sendResponse(['message' => 'Bad Request: Topic ID is required for update.'], 400);
-            updateTopic($db, $requestBody);
+            if (empty($requestBody['topic_id'])) sendResponse(['message' => 'Topic ID is required'], 400);
+            else updateTopic($db, $requestBody);
         } elseif ($requestMethod === 'DELETE') {
             $topicId = $queryParams['id'] ?? ($requestBody['topic_id'] ?? null);
-            if (empty($topicId)) sendResponse(['message' => 'Bad Request: Topic ID is required for deletion.'], 400);
-            deleteTopic($db, $topicId);
+            if (empty($topicId)) sendResponse(['message' => 'Topic ID is required'], 400);
+            else deleteTopic($db, $topicId);
         } else sendResponse(['message' => 'Method Not Allowed'], 405);
     } elseif ($resource === 'replies') {
         if ($requestMethod === 'GET') {
             $topicId = $queryParams['topic_id'] ?? null;
-            if (empty($topicId)) sendResponse(['status' => 'error', 'message' => 'Topic ID is required.'], 400);
-            getRepliesByTopicId($db, $topicId);
+            if (empty($topicId)) sendResponse(['message' => 'Topic ID is required'], 400);
+            else getRepliesByTopicId($db, $topicId);
         } elseif ($requestMethod === 'POST') createReply($db, $requestBody);
         elseif ($requestMethod === 'DELETE') {
             $replyId = $queryParams['id'] ?? ($requestBody['reply_id'] ?? null);
-            if (empty($replyId)) sendResponse(['message' => 'Bad Request: Reply ID is required for deletion.'], 400);
-            deleteReply($db, $replyId);
+            if (empty($replyId)) sendResponse(['message' => 'Reply ID is required'], 400);
+            else deleteReply($db, $replyId);
         } else sendResponse(['message' => 'Method Not Allowed'], 405);
     }
 } catch (PDOException $e) {
@@ -83,5 +141,4 @@ try {
 } catch (Exception $e) {
     sendResponse(['message' => 'Internal Server Error'], 500);
 }
-
 ?>
