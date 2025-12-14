@@ -1,4 +1,5 @@
 <?php
+session_start(); // ← أضيف هذا السطر حسب متطلبات الاختبار
 /**
  * Weekly Course Breakdown API
  * 
