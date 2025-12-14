@@ -9,7 +9,12 @@ checkAdmin();
 require_once "includes/db.php";
 require "includes/header.php";
 
-$students = $pdo->query("SELECT * FROM students ORDER BY id DESC")->fetchAll();
+try {
+    $students = $pdo->query("SELECT * FROM students ORDER BY id DESC")->fetchAll();
+} catch (PDOException $e) {
+    echo "<p style='color:red;'>Database error: " . htmlspecialchars($e->getMessage()) . "</p>";
+    $students = [];
+}
 ?>
 
 <h2>Manage Students</h2>
@@ -30,13 +35,13 @@ $students = $pdo->query("SELECT * FROM students ORDER BY id DESC")->fetchAll();
     <tbody>
         <?php foreach ($students as $s): ?>
             <tr>
-                <td><?= $s['id'] ?></td>
+                <td><?= htmlspecialchars($s['id']) ?></td>
                 <td><?= htmlspecialchars($s['name']) ?></td>
                 <td><?= htmlspecialchars($s['student_id']) ?></td>
                 <td><?= htmlspecialchars($s['email']) ?></td>
                 <td>
-                    <a href="student_edit.php?id=<?= $s['id'] ?>">Edit</a> |
-                    <a href="student_delete.php?id=<?= $s['id'] ?>" style="color:red;">Delete</a>
+                    <a href="student_edit.php?id=<?= htmlspecialchars($s['id']) ?>">Edit</a> |
+                    <a href="student_delete.php?id=<?= htmlspecialchars($s['id']) ?>" style="color:red;">Delete</a>
                 </td>
             </tr>
         <?php endforeach; ?>
