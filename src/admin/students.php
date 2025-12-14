@@ -1,10 +1,13 @@
 <?php
-session_start();
+// Start session if not already started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-require_once "../includes/auth.php";
+require_once "includes/auth.php";
 checkAdmin();
-require_once "../includes/db.php";
-require "../includes/header.php";
+require_once "includes/db.php";
+require "includes/header.php";
 
 $students = $pdo->query("SELECT * FROM students ORDER BY id DESC")->fetchAll();
 ?>
