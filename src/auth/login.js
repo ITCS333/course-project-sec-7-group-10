@@ -1,101 +1,133 @@
-<!--
-  Requirement: Create a Responsive Login Page
+/*
+  Requirement: Add client-side validation to the login form.
 
   Instructions:
-  Fill in the HTML elements as described in the comments.
-  Use the provided IDs for the elements that require them.
-  You are encouraged to use a CSS framework for styling, as hinted in the comments,
-  but you can also use your own stylesheet.
--->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <!-- TODO: Add the 'meta' tag to specify the character encoding for the document to be UTF-8. -->
-    <meta charset="UTF-8">
+  1. Link this file to your HTML using a <script> tag with the 'defer' attribute.
+     Example: <script src="login.js" defer></script>
+  
+  2. In your login.html, add a <div> element *after* the </fieldset> but
+     *before* the </form> closing tag. Give it an id="message-container".
+     This div will be used to display success or error messages.
+     Example: <div id="message-container"></div>
+  
+  3. Implement the JavaScript functionality as described in the TODO comments.
+*/
 
-    <!-- TODO: Add the 'meta' tag that makes the page responsive.
-         The 'name' should be 'viewport' and the 'content' should set the 'width' to 'device-width'
-         and the 'initial-scale' to '1.0'. -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+// --- Element Selections ---
+// We can safely select elements here because 'defer' guarantees
+// the HTML document is parsed before this script runs.
 
-    <!-- TODO: Add a 'title' for the page. It should be "Login". -->
-    <title>Login</title>
+// TODO: Select the login form. (You'll need to add id="login-form" to the <form> in your HTML).
+const loginForm = document.getElementById("login-form");
+// TODO: Select the email input element by its ID.
+const emailInput = document.getElementById("email");
 
-    <!-- TODO: Link to a CSS file or a CSS framework like PicoCSS or Bootstrap to style the page. You can use a CDN link. -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
-    <style>
-        body {
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+// TODO: Select the password input element by its ID.
+const passwordInput = document.getElementById("password");
 
-        main {
-            width: 100%;
-            max-width: 400px;
-        }
-    </style>
+// TODO: Select the message container element by its ID.
+const messageContainer = document.getElementById("message-container");
 
-</head>
-<body>
-    <!-- This will be the main content area of the page. -->
-    <!-- TODO: Use the 'main' element to contain the login form, as it represents the primary content of the document. -->
-    <main>
-        <!-- This 'section' groups the related content of the login form. -->
-        <!-- TODO: Create a 'section' element to act as the login card. -->
-        <section>
-            <!-- The heading of the login form -->
-            <!-- TODO: Add a heading element (e.g., 'h1' or 'h2') for the form's title. The text should be "Welcome Back!". -->
-            <h1>Welcome Back!</h1>
+// --- Functions ---
 
-            <!-- The form element will wrap all the inputs. -->
-            <!-- TODO: Create a 'form' element. The 'action' can be '#' for now. -->
-            <!-- Added id="login-form" for JavaScript -->
-            <form id="login-form" action="#">
-                <!-- TODO: Use a 'fieldset' to group all the related controls for the login form. -->
-                <fieldset>
-                    <!-- TODO: Add a 'legend' to caption the fieldset. e.g., "Secure Login". This improves accessibility. -->
-                    <legend>Secure Login</legend>
+/**
+ * TODO: Implement the displayMessage function.
+ * This function takes two arguments:
+ * 1. message (string): The message to display.
+ * 2. type (string): "success" or "error".
+ *
+ * It should:
+ * 1. Set the text content of `messageContainer` to the `message`.
+ * 2. Set the class name of `messageContainer` to `type`
+ * (this will allow for CSS styling of 'success' and 'error' states).
+ */
+function displayMessage(message, type) {
+  messageContainer.textContent = message;
+  messageContainer.className = type;
+}
 
-                    <!-- TODO: Add a 'label' for the email input field.
-                         The 'for' attribute should be "email".
-                         The text should be "Email Address". -->
-                    <label for="email">Email Address</label>
+/**
+ * TODO: Implement the isValidEmail function.
+ * This function takes one argument:
+ * 1. email (string): The email string to validate.
+ *
+ * It should:
+ * 1. Use a regular expression to check if the email format is valid.
+ * 2. Return `true` if the email is valid (e.g., "test@example.com").
+ * 3. Return `false` if the email is invalid (e.g., "test@", "test.com", "test@.com").
+ *
+ * A simple regex for this purpose is: /\S+@\S+\.\S+/
+ */
+function isValidEmail(email) {
+  const regex = /\S+@\S+\.\S+/;
+  return regex.test(email);
+}
 
-                    <!-- TODO: Add an 'input' field for the email.
-                         - The type should be "email".
-                         - The id must be "email".
-                         - It should be a required field. -->
-                    <input type="email" id="email" required>
+/**
+ * TODO: Implement the isValidPassword function.
+ * This function takes one argument:
+ * 1. password (string): The password string to validate.
+ *
+ * It should:
+ * 1. Check if the password length is 8 characters or more.
+ * 2. Return `true` if the password is valid.
+ * 3. Return `false` if the password is not valid.
+ */
+function isValidPassword(password) {
+  return password.length >= 8;
+}
 
-                    <!-- TODO: Add a 'label' for the password input field.
-                         The 'for' attribute should be "password".
-                         The text should be "Password". -->
-                    <label for="password">Password</label>
+/**
+ * TODO: Implement the handleLogin function.
+ * This function will be the event handler for the form's "submit" event.
+ * It should:
+ * 1. Prevent the form's default submission behavior.
+ * 2. Get the `value` from `emailInput` and `passwordInput`, trimming any whitespace.
+ * 3. Validate the email using `isValidEmail()`.
+ * - If invalid, call `displayMessage("Invalid email format.", "error")` and stop.
+ * 4. Validate the password using `isValidPassword()`.
+ * - If invalid, call `displayMessage("Password must be at least 8 characters.", "error")` and stop.
+ * 5. If both email and password are valid:
+ * - Call `displayMessage("Login successful!", "success")`.
+ * - (Optional) Clear the email and password input fields.
+ */
+function handleLogin(event) {
+  event.preventDefault();
 
-                    <!-- TODO: Add an 'input' field for the password.
-                         - The type should be "password".
-                         - The id must be "password".
-                         - It should be a required field.
-                         - For validation, add a 'minlength' attribute (e.g., minlength="8"). -->
-                    <input type="password" id="password" required minlength="8">
+  const email = emailInput.value.trim();
+  const password = passwordInput.value.trim();
 
-                    <!-- This is the form submission button. -->
-                    <!-- TODO: Add a 'button' to submit the form, inside the fieldset.
-                         - The type should be "submit".
-                         - The id must be "login".
-                         - The text should be "Log In". -->
-                    <button type="submit" id="login">Log In</button>
-                </fieldset>
+  if (!isValidEmail(email)) {
+    displayMessage("Invalid email format.", "error");
+    return;
+  }
 
-                <!-- TODO: Add a message container div after the fieldset but before closing the form -->
-                <div id="message-container"></div>
-            </form>
-        </section>
-    </main>
+  if (!isValidPassword(password)) {
+    displayMessage("Password must be at least 8 characters.", "error");
+    return;
+  }
 
-    <!-- TODO: Add a script tag to link your JavaScript file -->
-    <script src="auth/login.js" defer></script>
-</body>
-</html>
+  // Both valid
+  displayMessage("Login successful!", "success");
+  // Optionally clear inputs
+  emailInput.value = "";
+  passwordInput.value = "";
+}
+
+/**
+ * TODO: Implement the setupLoginForm function.
+ * This function will be called once to set up the form.
+ * It should:
+ * 1. Check if `loginForm` exists.
+ * 2. If it exists, add a "submit" event listener to it.
+ * 3. The event listener should call the `handleLogin` function.
+ */
+function setupLoginForm() {
+  if (loginForm) {
+    loginForm.addEventListener("submit", handleLogin);
+  }
+}
+
+// --- Initial Page Load ---
+// Call the main setup function to attach the event listener.
+setupLoginForm();
