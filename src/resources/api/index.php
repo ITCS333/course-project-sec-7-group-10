@@ -11,10 +11,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
+// Database connection
 require_once '../config/Database.php';
 $database = new Database();
 $db = $database->getConnection();
 
+// Request info
 $method = $_SERVER['REQUEST_METHOD'];
 $input = json_decode(file_get_contents('php://input'), true);
 $action = $_GET['action'] ?? null;
@@ -22,14 +24,11 @@ $id = $_GET['id'] ?? null;
 $resource_id = $_GET['resource_id'] ?? null;
 $comment_id = $_GET['comment_id'] ?? null;
 
+// ================= HELPER FUNCTIONS =================
 function sendResponse($data, $statusCode = 200) {
     http_response_code($statusCode);
     echo json_encode($data, JSON_PRETTY_PRINT);
     exit;
-}
-
-function validateUrl($url) {
-    return filter_var($url, FILTER_VALIDATE_URL) !== false;
 }
 
 function sanitizeInput($data) {
@@ -46,12 +45,16 @@ function validateRequiredFields($data, $requiredFields) {
     return ['valid' => count($missing) === 0, 'missing' => $missing];
 }
 
+function validateUrl($url) {
+    return filter_var($url, FILTER_VALIDATE_URL) !== false;
+}
+
+// ================= RESOURCE FUNCTIONS =================
 function getAllResources($db) {
-    $query = "SELECT id, title, description, link, created_at FROM resources ORDER BY created_at DESC";
-    $stmt = $db->prepare($query);
+    $stmt = $db->prepare("SELECT id, title, description, link, created_at FROM resources ORDER BY created_at DESC");
     $stmt->execute();
     $resources = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    sendResponse(['success' => true, 'data' => $resources]);
+    sendResponse(['success'=>true, 'data'=>$resources]);
 }
 
 function getResourceById($db, $resourceId) {
@@ -59,19 +62,17 @@ function getResourceById($db, $resourceId) {
     $stmt = $db->prepare("SELECT id, title, description, link, created_at FROM resources WHERE id=?");
     $stmt->execute([$resourceId]);
     $resource = $stmt->fetch(PDO::FETCH_ASSOC);
-    if ($resource) {
-        sendResponse(['success'=>true,'data'=>$resource]);
-    } else {
-        sendResponse(['success'=>false,'message'=>'Resource not found'],404);
-    }
+    if ($resource) sendResponse(['success'=>true,'data'=>$resource]);
+    else sendResponse(['success'=>false,'message'=>'Resource not found'],404);
 }
 
 function createResource($db, $data) {
-    $check = validateRequiredFields($data, ['title','link']);
+    $check = validateRequiredFields($data,['title','link']);
     if (!$check['valid']) sendResponse(['success'=>false,'message'=>'Missing fields: '.implode(', ',$check['missing'])],400);
-
+    
     $title = sanitizeInput($data['title']);
-    $description = isset($data['description']) ? sanitizeInput($data['description']) : '';
+    $description = $data['description'] ?? '';
+    $description = sanitizeInput($description);
     $link = sanitizeInput($data['link']);
     if (!validateUrl($link)) sendResponse(['success'=>false,'message'=>'Invalid URL'],400);
 
@@ -83,6 +84,7 @@ function createResource($db, $data) {
     }
 }
 
+// ================= COMMENT FUNCTIONS =================
 function getCommentsByResourceId($db, $resourceId) {
     if (!is_numeric($resourceId)) sendResponse(['success'=>false,'message'=>'Invalid resource ID'],400);
     $stmt = $db->prepare("SELECT id, resource_id, author, text, created_at FROM comments WHERE resource_id=? ORDER BY created_at ASC");
@@ -103,7 +105,6 @@ function createComment($db, $data) {
 
     $author = sanitizeInput($data['author']);
     $text = sanitizeInput($data['text']);
-
     $stmt = $db->prepare("INSERT INTO comments (resource_id, author, text) VALUES (?,?,?)");
     if ($stmt->execute([$data['resource_id'],$author,$text])) {
         sendResponse(['success'=>true,'message'=>'Comment created','id'=>$db->lastInsertId()],201);
@@ -112,21 +113,15 @@ function createComment($db, $data) {
     }
 }
 
+// ================= REQUEST ROUTER =================
 try {
     if ($method === 'GET') {
-        if ($action==='comments' && $resource_id) {
-            getCommentsByResourceId($db,$resource_id);
-        } elseif ($id) {
-            getResourceById($db,$id);
-        } else {
-            getAllResources($db);
-        }
+        if ($action==='comments' && $resource_id) getCommentsByResourceId($db,$resource_id);
+        elseif ($id) getResourceById($db,$id);
+        else getAllResources($db);
     } elseif ($method==='POST') {
-        if ($action==='comment') {
-            createComment($db,$input);
-        } else {
-            createResource($db,$input);
-        }
+        if ($action==='comment') createComment($db,$input);
+        else createResource($db,$input);
     } else {
         sendResponse(['success'=>false,'message'=>'Method not allowed'],405);
     }
